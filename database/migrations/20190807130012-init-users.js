@@ -11,12 +11,6 @@ module.exports = {
         allowNull: false,
         comment: 'user name'
       },
-      phone: {
-        type: STRING(255),
-        allowNull: false,
-        unique: true,
-        comment: 'user phone'
-      },
       address: {
         type: STRING(255),
         allowNull: false,

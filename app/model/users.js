@@ -6,8 +6,7 @@
 module.exports = app => {
   const {
     STRING,
-    INTEGER,
-    Op
+    INTEGER
   } = app.Sequelize;
 
   const Users = app.model.define('users', {
@@ -15,12 +14,6 @@ module.exports = app => {
       type: STRING(255),
       allowNull: false,
       comment: 'user name'
-    },
-    phone: {
-      type: STRING(255),
-      allowNull: false,
-      unique: true,
-      comment: 'user phone'
     },
     address: {
       type: STRING(255),
@@ -41,31 +34,19 @@ module.exports = app => {
         method: 'BTREE',
         fields: [ 'address' ],
         name: 'address'
-      },
-      {
-        unique: true,
-        method: 'BTREE',
-        fields: [ 'phone' ],
-        name: 'phone'
       }
     ]
   });
   Users.addUser = async function(userInfo = {}) {
-    await this.findCreateFind({
+    const result = await this.findCreateFind({
       where: {
-        [Op.or]: [
-          {
-            address: userInfo.address
-          },
-          {
-            phone: userInfo.phone
-          }
-        ]
+        address: userInfo.address
       },
       defaults: {
         ...userInfo
       }
     });
+    return result;
   };
   return Users;
 };

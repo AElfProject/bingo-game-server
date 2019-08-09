@@ -13,26 +13,21 @@ class UserInfoController extends Controller {
       },
       name: {
         type: 'string'
-      },
-      phone: {
-        type: 'string'
       }
     };
     try {
       this.validate(rule);
       const {
         address,
-        name,
-        phone
+        name
       } = ctx.request.body;
       const [ result, isNew ] = await ctx.model.Users.addUser({
         address,
-        name,
-        phone
+        name
       });
       if (!isNew) {
         this.error({
-          message: 'You have registered this account by this phone',
+          message: 'You have registered this account',
           code: 300,
           errors: []
         });
