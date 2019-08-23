@@ -5,8 +5,6 @@
 const moment = require('moment');
 const Controller = require('../core/baseController');
 
-const TOP_RECORDS_KEY = 'top_records';
-
 class RecordsController extends Controller {
   async addRecord() {
     const { ctx } = this;
@@ -38,13 +36,15 @@ class RecordsController extends Controller {
 
   async topRecords() {
     const { ctx, app } = this;
-    console.log('cache', app.cache);
+    const {
+      cacheKey
+    } = app.config;
     try {
-      let list = app.cache.getCache(TOP_RECORDS_KEY);
+      let list = app.cache.getCache(cacheKey.topRecords.name);
       if (!Array.isArray(list)) {
         console.log('get from database');
         list = await ctx.model.Results.getTopRecords();
-        app.cache.setCache(TOP_RECORDS_KEY, list);
+        app.cache.setCache(cacheKey.topRecords.name, list);
       }
       this.sendBody({
         list
@@ -74,8 +74,8 @@ class RecordsController extends Controller {
         total,
         list: result.map(v => ({
           ...v.dataValues,
-          time: moment(v.dataValues.time).unix()
-        })).sort((a, b) => b.time - a.time)
+          time: moment(v.dataValues.time).format('YYYY-MM-DD HH:mm:ss')
+        }))
       });
     } catch (e) {
       e.code = e.code ? e.code : 400;

@@ -15,8 +15,12 @@ class CacheService {
   }
 
   initCache(key, value, config = defaultCacheConfig) {
+    const mergedConfig = {
+      ...defaultCacheConfig,
+      ...config
+    };
     const scheduler = new Scheduler({
-      interval: config.expireTimeout
+      interval: mergedConfig.expireTimeout
     });
     scheduler.setCallback(() => {
       const originVal = this.cacheList.get(key);
@@ -29,7 +33,7 @@ class CacheService {
     this.cacheList.set(key, {
       value,
       expired: false,
-      config,
+      config: mergedConfig,
       scheduler,
     });
   }

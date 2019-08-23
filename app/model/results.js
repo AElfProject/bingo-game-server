@@ -15,7 +15,6 @@ module.exports = app => {
   } = app.Sequelize;
   const { initialAmount } = app.config;
 
-  // todo: 添加索引
   const Results = app.model.define('results', {
     address: {
       type: STRING(255),
@@ -54,7 +53,7 @@ module.exports = app => {
   });
 
   Results.getSingleUserResult = async function(address, offset = 0) {
-    await this.findAll({
+    const result = await this.findAll({
       attributes: [ 'address', 'result', 'time' ],
       indexHints: [
         { type: IndexHints.USE, values: [ 'address' ] }
@@ -67,30 +66,32 @@ module.exports = app => {
         [ 'count', 'DESC' ]
       ]
     });
+    return result;
   };
 
   Results.getSingleCount = async function(address) {
-    await this.findAll({
+    const result = await this.findAll({
       attributes: [[ fn('COUNT', col('address')), 'total' ]],
       where: {
         address
       }
     });
+    return result;
   };
 
   Results.getTopRecords = async function(limit = 20) {
     const result = await this.findAll({
-      attributes: [ 'address', [ fn('SUM', col('result')), 'total' ]],
+      attributes: [ 'address', [ fn('SUM', col('result')), 'total' ], [ fn('COUNT', col('result')), 'times' ]],
       group: 'address',
       order: [
         [ fn('SUM', col('result')), 'DESC' ]
-      ],
-      limit
+      ]
     });
     return result.map(v => {
-      v.total += initialAmount;
-      return v;
-    });
+      const result = v.dataValues;
+      result.total = parseInt(result.total, 10) + initialAmount;
+      return result;
+    }).filter(v => v.times >= 3).slice(0, limit);
   };
 
   return Results;

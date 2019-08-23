@@ -34,7 +34,16 @@ module.exports = appInfo => {
   };
 
   // 初始token
-  config.initialAmount = 10000;
+  config.initialAmount = 100000;
 
+  config.cacheKey = {
+    topRecords: {
+      name: 'top_records',
+      initialValue: [],
+      options: {
+        expireTimeout: 5000
+      }
+    }
+  };
   return config;
 };
