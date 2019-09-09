@@ -17,6 +17,7 @@ class Scheduler {
     this.timerRef = null;
     this.paused = false;
     this.loopTimes = 0;
+    this.isEnd = false;
   }
 
   setInterval(interval) {
@@ -29,6 +30,9 @@ class Scheduler {
 
   setTimer(interval) {
     this.timerRef = setTimeout(async () => {
+      if (this.isEnd) {
+        return;
+      }
       this.runnerTimeStart = new Date().getTime();
       if (!this.paused) {
         await this.config.callback(++this.loopTimes);
@@ -65,6 +69,7 @@ class Scheduler {
   }
 
   endTimer() {
+    this.isEnd = true;
     if (this.timerRef) {
       clearTimeout(this.timerRef);
       this.timerRef = null;

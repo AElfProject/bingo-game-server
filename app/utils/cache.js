@@ -23,11 +23,7 @@ class CacheService {
       interval: mergedConfig.expireTimeout
     });
     scheduler.setCallback(() => {
-      const originVal = this.cacheList.get(key);
-      this.cacheList.set(key, {
-        ...originVal,
-        expired: true
-      });
+      this.removeCache(key);
     });
     scheduler.startTimer();
     this.cacheList.set(key, {
